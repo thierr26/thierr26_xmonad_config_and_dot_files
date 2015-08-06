@@ -1,0 +1,17 @@
+"amixer set 'Headphone' 5%+; amixer set 'Front' 5%+"
+    m:0x10 + c:123
+
+"amixer set 'Headphone' 5%-; amixer set 'Front' 5%-"
+    m:0x10 + c:122
+
+"amixer set 'Headphone' toggle; amixer set 'Front' toggle"
+    m:0x10 + c:121
+
+"mocp -r"
+    m:0x10 + c:173
+
+"mocp -S 2>/dev/null; if [ $? -eq 0 ]; then mocp -p; else mocp -f; fi;"
+    m:0x10 + c:171
+
+"mocp -G"
+    m:0x10 + c:172

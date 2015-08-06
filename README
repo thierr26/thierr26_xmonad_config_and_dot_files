@@ -1,0 +1,239 @@
+This repository contains the author's xmonad configuration as well as other
+"dot files" that the author has had to write to achieve a satisfactory
+configuration.
+
+xmonad is a tiling window manager. On a Debian GNU/Linux system, you can
+install it and other useful packages for compiling a custom configuration with
+the command (as root):
+
+apt-get install xmonad ghc libghc-xmonad-dev libghc-xmonad-contrib-dev
+
+If you are not familiar with xmonad and xmonad configuration, you may want to
+read the following pages:
+
+        - http://xmonad.org/about.html
+
+        - http://xmonad.org/tour.html
+
+        - http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Doc-Configuring.html
+
+The author could write his configuration files with a lot of googling. Some
+web pages have been particularly helpful:
+
+        - https://wiki.haskell.org/Xmonad/Config_archive/John_Goerzen%27s_Configuration
+
+        - http://joeyh.name/blog/entry/xmonad_layouts_for_netbooks/
+
+So the files in this repository are:
+
+==============================================================================
+.xinitrc
+
+        Thanks to this file and the "xsetroot -cursor_name left_ptr" command
+        that it contains, the mouse cursor is the classical arrow instead of
+        the default "X" cursor in some application (in particular Claws Mail).
+
+==============================================================================
+.Xresources
+
+        This file sets some default parameters for xterm, xmessage and dclock.
+        In particular, the line:
+
+        xmessage*international: true
+
+        causes xmessage to display UTF-8 encoded messages properly.
+
+        The line:
+
+        XTerm*faceName: Inconsolata
+
+        causes the font Inconsolata to be used in xterm. To install this font
+        on a Debian GNU/Linux system, issue the command (as root):
+
+        apt-get install fonts-inconsolata
+
+==============================================================================
+.moc/config, the author's MOC (music on console) configuration.
+
+        The line:
+
+        Shuffle = yes
+
+        causes MOC to start with the shuffle mode enabled.
+
+        To install MOC on a Debian GNU/Linux system, issue the command (as
+        root):
+
+        apt-get install moc
+
+==============================================================================
+.xbindkeysrc, the author's user configuration file for xbindkeys.
+
+        It binds the multimedia keys of the keyboard to command lines. It has
+        been tested with a Cherry Stream XT corded keyboard only. Hopefully it
+        works on most other keyboards.
+
+        The "volume up", "volume down" and "mute" keys are bound to amixer
+        commands. On a Debian GNU/Linux system, amixer is available in the
+        alsa-utils package.
+
+        The "next track", "previous track" and "pause" keys are bound to MOC
+        (music on console) commands. In particular, the "next track" key is
+        bound to this command:
+
+        mocp -S 2>/dev/null; if [ $? -eq 0 ]; then mocp -p; else mocp -f; fi;
+
+        which causes MOC to play the next track if it is already running, or
+        to be launched and start playing if it is not already running. If you
+        have all your music in a single play list, and the MOC shuffle mode
+        enabled in .moc/config, then you can have your music start playing in
+        random order by pressing only the "next track" key and you never need
+        to open the MOC interface.
+
+        To install xbindkeys on a Debian GNU/Linux system, issue the command
+        (as root):
+
+        apt-get install xbindkeys
+
+==============================================================================
+.xmonad/xmonad.hs, the author's xmonad configuration.
+
+        This file is heavily commented. Here is a description of the
+        configuration:
+
+                - The Mod key is bound to the Windows key (Mod4).
+
+                - The key binding is adapted for AZERTY keyboards users.
+
+                - dmenu shows up at the bottom of screen instead of at the
+                  top, and with specific colors.
+
+                - Mod key + left arrow and Mod key + right arrow allow cycling
+                  through the non-empty workspaces.
+
+                - Mod + x triggers a command prompt.
+
+                - Mod + shift + q and mod + q trigger a "system" menu
+                  (Shutdown / Reboot / Exit / Lock / Restart XMonad).
+
+                  Note that the Shutdown and Reboot commands won't work if the
+                  user is not allowed to run "sudo poweroff" and "sudo reboot"
+                  without password. To allow the users to run "sudo poweroff"
+                  and "sudo reboot" without password, the system administrator
+                  may add this line in /etc/sudoers using visudo:
+
+                  ALL     ALL=NOPASSWD: /sbin/poweroff, /sbin/reboot
+
+                  Not also that the Lock command lauches xtrlock and thus
+                  won't work if xtrlock is not installed on the system. On a
+                  Debian GNU/Linux system, you can install it with the command
+                  (as root):
+
+                  apt-get install xtrlock
+
+                - Mod + shift + m shows the title currently played by MOC
+                  (music on console).
+
+                - The workspaces are given names:
+                  * 1:mail
+                  * 2:web
+                  * 3:chat
+                  * 4:image1
+                  * 5:image2
+                  * 6:edit1
+                  * 7:edit2
+                  * 8:edit3
+                  * 9:edit4
+
+                - The names of the workspaces are briefly displayed when
+                  switching between workspaces.
+
+                - Some applications are automatically moved to particular
+                  workspaces:
+                  * Claws Mail to 1:mail,
+                  * Iceweasel to 2:web,
+                  * Gajim to 3:chat,
+                  * xzgv to 4:image1,
+                  * GIMP to 5:image2.
+
+                - GIMP and xmessage are automatically moved to the floating
+                  layer.
+
+                - On xmonad startup or restart, the script .xmonad/hooks is
+                  run with the "startup" argument which causes three
+                  applications to be automatically launched, if they are
+                  installed on the system and if they are not already run by
+                  the user:
+                  * dclock,
+                  * Claws Mail,
+                  * Iceweasel.
+
+                  As already mentioned, Claws Mail and Iceweasel are
+                  automatically moved to particular workspaces.
+
+                  dclock is permanently displayed in the upper right corner of
+                  the screen and shows the time and date. In the text of the
+                  .xmonad/xmonad.hs file, it is assumed that the screen is
+                  1920 pixels wide. If your screen is a different resolution,
+                  then you probably want to replace 1920 with the pixel width
+                  of your screen.
+
+                  On a Debian GNU/Linux system, you can install dclock with
+                  the command (as root):
+
+                  apt-get install dclock
+
+                  It is possible to partially or totally disable the script
+                  .xmonad/hooks through environment variables definitions.
+                  Please run the script .xmonad/hooks with the --help option
+                  for more information.
+
+                - There are two layouts available in each workspace : the
+                  "fixed column" layout and the "full screen" layout. You can
+                  switch between them with Mod + space.
+
+                  In all but the four "edit" workspaces, the width of the
+                  master pane is fixed to 80 characters, which is good for
+                  working in a terminal or editing a file in (say) Vim with a
+                  80 characters text width.
+
+                  In the four "edit" workspaces, the width of the master pane
+                  is fixed to 163 characters which is good for editing two
+                  files side by side in Vim (vertical split) with the
+                  foldcolumn option set to 1 and a 80 characters text width in
+                  both files.
+
+                  You might want to try the Wibafoco Vim plugin which
+                  automatically changes the foldcolumn option depending on the
+                  Vim window width. This plugin is available here:
+
+                  https://github.com/thierr26/wibafoco
+
+==============================================================================
+.xmonad/hooks, the shell script which is run on xmonad startup and restart in
+the author's configuration.
+
+        When run with the "startup" argument, this script launches the
+        following applicationq if they are installed on the system and if they
+        are not already run by the user:
+        * dclock,
+        * Claws Mail,
+        * Iceweasel.
+
+        It is possible to partially or totally disable the script through
+        environment variables definitions. Please run the script with the
+        --help option for more information.
+
+==============================================================================
+install_thierr26_xmonad_config_and_dot_files, a shell script to install the
+files.
+
+        This script copies all the above files to the user's home directory or
+        to the directory specified on the command line. Launch the script with
+        the --help option for a complete documentation.
+
+==============================================================================
+README, the present file.
+
+==============================================================================
+LICENSE, the license file (Unlicense license).

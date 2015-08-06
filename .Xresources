@@ -1,0 +1,52 @@
+! Have XTerm display 256 colors.
+XTerm*termName: xterm-256color
+
+! Have XTerm display correctly UTF-8 in title bar.
+XTerm*utf8Title: true
+
+! Use Inconsolata font, size 12, in XTerm.
+XTerm*faceName: Inconsolata
+XTerm*faceSize: 12
+
+! Set word boundaries in XTerm so that full path names or words containing a
+! dash (-) are entirely selected on double click.
+XTerm*charClass: 0-32:1,33-126:2,127-160:3,161-255:2
+
+! -----------------------------------------------------------------------------
+
+! Have xmessage display UTF-8 encoded messages properly.
+xmessage*international: true
+
+! Define xmessage colors.
+xmessage.form.okay.background: #202020
+xmessage.form.okay.foreground: lightgray
+xmessage*background: #202020
+xmessage*foreground: lightgray
+
+! Define xmessage position.
+xmessage*geometry: +700+600
+
+! -----------------------------------------------------------------------------
+
+! Don't sound the bell in dclock.
+dclock*bell: false
+
+! Prevent the colon from blinking in dclock.
+dclock*blink: false
+
+! Use 24 hour time format in dclock.
+dclock*militaryTime: true
+
+! Draw the digits with no slope in dclock.
+dclock*angle: 100
+
+! Draw thin digits in dclock.
+dclock*widthFactor: 0.09
+
+! Define the font for the date in dclock.
+dclock*font: -*-fixed-bold-*-semicondensed-*-*-*-*-*-*-*-iso8859-*
+
+! Define dclock colors.
+dclock*background: black
+dclock*foreground: #7ec0ee
+dclock*led_off: #080808

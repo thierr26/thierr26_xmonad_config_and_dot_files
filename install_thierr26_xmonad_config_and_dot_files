@@ -1,0 +1,377 @@
+#!/bin/sh
+
+# -----------------------------------------------------------------------------
+
+# Prepends the argument with "FATAL ERROR: " and echoes it to standard error,
+# then terminates the script with exit status 1. If no argument or empty
+# argument given, echoes "FATAL_ERROR" to standard error then terminates the
+# script with exit status 1.
+#
+# ARGUMENT:
+# $1: Any string.
+fatal() {
+
+    FATAL_ERROR="FATAL ERROR";
+    if [ $# -gt 0 ] && [ -n "$1" ]; then
+        echo "$FATAL_ERROR: $1">&2;
+    else
+        echo "$FATAL_ERROR">&2;
+    fi;
+    echo "Use \"$SCRIPT_PATH --help\" for documentation">&2;
+
+    exit 1;
+}
+
+# -----------------------------------------------------------------------------
+
+# Echoes the first argument being an executable command. Echoes nothing if none
+# of the arguments is an executable command.
+#
+# ARGUMENTS:
+# Any strings.
+echo_cmd() {
+    until [ $# -eq 0 ] || command -v "$1"; do
+        shift;
+    done;
+}
+
+# -----------------------------------------------------------------------------
+
+# Echoes the first argument being an executable command and returns with exit
+# status 0. If none of the arguments is an executable command, then terminates
+# the script with a call to function fatal and thus exit status 1.
+#
+# ARGUMENTS:
+# Any strings.
+echo_cmd_fatal() {
+
+    until [ $# -eq 0 ] || command -v "$1"; do
+        LAST_CMD="$1";
+        shift;
+    done;
+
+    if [ $# -eq 0 ]; then
+        if [ -n "$LAST_CMD" ]; then
+            fatal "$LAST_CMD does not seem to be installed.";
+        else
+            fatal;
+        fi;
+    fi;
+}
+
+# -----------------------------------------------------------------------------
+
+# prints the documentation for the script to the standard output.
+#
+# ARGUMENT
+# $1: Script name.
+documentation() {
+
+    FMT="fmt";
+    CMD=$(echo_cmd_fatal "$FMT" cat);
+    if [ ${CMD##*/} = "$FMT" ] && [ -n "$(echo_cmd tput)" ]; then
+        CMD="fmt --width=$(tput cols)";
+    fi;
+
+    local SCRIPT_NAME="$1";
+    $CMD <<EOF
+Usage:
+
+    $SCRIPT_NAME [-f|--force] [DEST]
+EOF
+    $CMD <<EOF
+    $SCRIPT_NAME -h|--help
+
+Description:
+
+    $SCRIPT_NAME copies the files .vimrc and .gtkrc-2.0 located in the same \
+directory as itself into your home directory or into the destination \
+directory specified on the command line.
+
+    If the -f or --force option is specified, the user is not prompted for \
+confirmation before overwriting existing files.
+
+Options:
+
+    -f, --force
+        Do not prompt the user before overwriting existing files.
+
+    -h, --help
+        Display this documentation and exit.
+EOF
+}
+
+# -----------------------------------------------------------------------------
+
+# Returns 0 if the argument starts with "-". Returns 1 otherwise.
+#
+# ARGUMENT
+# $1: Any string.
+has_hyphen_leader() {
+    if [ -n "$1" ] && [ -z ${1%%-*} ]; then
+        return 0;
+    else
+        return 1;
+    fi;
+}
+
+# -----------------------------------------------------------------------------
+
+# Returns 0 if the argument starts with "--". Returns 1 otherwise.
+#
+# ARGUMENT
+# $1: Any string.
+has_double_hyphen_leader() {
+    if [ -n "$1" ] && [ -z ${1%%--*} ]; then
+        return 0;
+    else
+        return 1;
+    fi;
+}
+
+# -----------------------------------------------------------------------------
+
+# Is supposed to be called with all the arguments to the current script.
+#
+# Affects the following variables:
+#   HELP_OPT:  true if the user has requested the printing of the script
+#              documentation, false otherwise.
+#   FORCE_OPT: true if the user allows the overwriting of the destination files
+#              without confirmation, false otherwise.
+#   DEST:      Destination directory.
+#
+# An unrecognized option or an empty destination directory will cause the
+# script to terminate with a call to the fatal function and thus exit status 1.
+#
+# ARGUMENTS
+# All the arguments to the current script.
+process_args() {
+
+    HELP_OPT=false;
+    FORCE_OPT=false;
+    DEST=$HOME;
+
+    # Process the options.
+    OPT_PROCESSED=false;
+    while ! $OPT_PROCESSED && [ $# -gt 0 ] && has_hyphen_leader "$1"; do
+
+        OPT_STRING=${1#?}; # If $1 is "-abc" then $OPT_STRING is "abc".
+                           # If $1 is "--force" then $OPT_STRING is "-force".
+
+        if has_double_hyphen_leader "$1"; then
+            N=1;
+        else
+            N=${#OPT_STRING};
+        fi;
+
+        for k in $(seq 1 $N); do
+            if [ $N -gt 1 ]; then
+                OPT=${OPT_STRING%${OPT_STRING#?}}; # If $OPT_STRING is "abc" at
+                                                   # the beginning of the loop,
+                                                   # then $OPT is "a",
+                                                   # then "b", then "c".
+            else
+                OPT="$OPT_STRING";
+            fi;
+
+            case "-$OPT" in
+                --) OPT_PROCESSED=true;;
+                -h|--help) HELP_OPT=true;;
+                -f|--force) FORCE_OPT=true;;
+                *) fatal "Unrecognized option: -$OPT"
+            esac;
+
+            if [ $N -gt 1 ]; then
+                OPT_STRING=${OPT_STRING#?};
+            fi;
+        done;
+
+        shift;
+    done;
+
+    # Process the other arguments.
+    if [ $# -gt 0 ]; then
+        if [ -z "$1" ]; then
+            fatal "The destination directory must not be an empty string."
+        else
+            DEST=${1%/};
+        fi;
+    fi;
+}
+
+# -----------------------------------------------------------------------------
+
+# Returns 0 if the argument is the name of a readable file, otherwise calls the
+# fatal function and thus terminates the script with exit status 1.
+#
+# ARGUMENT
+# $1: A file name.
+is_readable_file() {
+    if ! [ -f "$1" ]; then
+        fatal "$1 is not a file.";
+    elif ! [ -r "$1" ]; then
+        fatal "$1 is not a readable file.";
+    fi;
+}
+
+# -----------------------------------------------------------------------------
+
+# Returns 0 if the argument is the name of a writable directory, otherwise
+# calls the fatal function and thus terminates the script with exit status 1.
+#
+# ARGUMENT
+# $1: A directory name.
+is_writable_dir() {
+    if ! [ -d "$1" ]; then
+        fatal "$1 is not a directory.";
+    elif ! [ -w "$1" ]; then
+        fatal "$1 is not a writable directory.";
+    fi;
+}
+
+# -----------------------------------------------------------------------------
+
+# Returns 0 if the argument is not the name of a directory, otherwise calls the
+# fatal function and thus terminates the script with exit status 1.
+#
+# ARGUMENT
+# $1: A directory name.
+is_not_a_dir() {
+    if [ -d "$1" ]; then
+        fatal "$1 already exists as a directory.";
+    fi;
+}
+
+# -----------------------------------------------------------------------------
+
+# Returns 0 if the argument is not the name of a read only file or directory,
+# otherwise calls the fatal function and thus terminates the script with exit
+# status 1.
+#
+# ARGUMENT
+# $1: A file or directory name.
+is_not_read_only() {
+    if [ -f "$1" ]; then
+        if ! [ -w "$1" ]; then
+            fatal "$1 already exists as a read only file or directory.";
+        fi;
+    fi;
+}
+
+# -----------------------------------------------------------------------------
+
+# If the first argument is true, then returns 0. Otherwise, asks to the user
+# whether he wants to overwrite the file whose name is the second argument. If
+# the user answers negatively, then returns 1.
+#
+# ARGUMENTS
+# $1: true to cause the function to return 0 without any confirmation.
+# $2: A file name.
+overwrite_not_forbidden() {
+    if ! $1 && [ -e "$2" ]; then
+        while true; do
+            echo -n "Overwrite $2 (y/n)? ";
+            read ANSWER;
+            case $ANSWER in
+                y|Y) return 0;;
+                n|N) return 1;;
+                *) echo "Please answer y (for yes) or n (for no)."
+            esac;
+        done;
+    fi
+}
+
+# -----------------------------------------------------------------------------
+
+# The script will terminate if trying to use an uninitialized variable.
+set -o nounset
+
+# The script will terminate if any statement returns a non-true return value.
+set -o errexit
+
+# Get the path to the script.
+SCRIPT_PATH="$0";
+
+# Get the base name of the script.
+SCRIPT_BASE_NAME=$(basename "$SCRIPT_PATH");
+
+process_args "$@";
+
+if $HELP_OPT; then
+    documentation $SCRIPT_BASE_NAME;
+else
+    F1_REL_NAME=.xmonad/xmonad.hs;
+    F2_REL_NAME=.xmonad/hooks;
+    F3_REL_NAME=.moc/config;
+    F4_REL_NAME=.xinitrc;
+    F5_REL_NAME=.Xresources;
+    F6_REL_NAME=.xbindkeysrc;
+
+    F1=${SCRIPT_PATH%/*}/$F1_REL_NAME;
+    F2=${SCRIPT_PATH%/*}/$F2_REL_NAME;
+    F3=${SCRIPT_PATH%/*}/$F3_REL_NAME;
+    F4=${SCRIPT_PATH%/*}/$F4_REL_NAME;
+    F5=${SCRIPT_PATH%/*}/$F5_REL_NAME;
+    F6=${SCRIPT_PATH%/*}/$F6_REL_NAME;
+
+    CP=$(echo_cmd_fatal cp);
+    MKDIR=$(echo_cmd_fatal mkdir);
+
+    if is_readable_file "$F1" \
+            && is_readable_file "$F2" \
+            && is_readable_file "$F3" \
+            && is_readable_file "$F4" \
+            && is_readable_file "$F5" \
+            && is_readable_file "$F6" \
+            && is_writable_dir "$DEST" \
+            && is_not_a_dir "$DEST/$F1_REL_NAME" \
+            && is_not_a_dir "$DEST/$F2_REL_NAME" \
+            && is_not_a_dir "$DEST/$F3_REL_NAME" \
+            && is_not_a_dir "$DEST/$F4_REL_NAME" \
+            && is_not_a_dir "$DEST/$F5_REL_NAME" \
+            && is_not_a_dir "$DEST/$F6_REL_NAME" \
+            && is_not_read_only "$DEST/$F1_REL_NAME" \
+            && is_not_read_only "$DEST/$F2_REL_NAME" \
+            && is_not_read_only "$DEST/$F3_REL_NAME" \
+            && is_not_read_only "$DEST/$F4_REL_NAME" \
+            && is_not_read_only "$DEST/$F5_REL_NAME" \
+            && is_not_read_only "$DEST/$F6_REL_NAME" \
+            && overwrite_not_forbidden $FORCE_OPT "$DEST/$F1_REL_NAME" \
+            && overwrite_not_forbidden $FORCE_OPT "$DEST/$F2_REL_NAME" \
+            && overwrite_not_forbidden $FORCE_OPT "$DEST/$F3_REL_NAME" \
+            && overwrite_not_forbidden $FORCE_OPT "$DEST/$F4_REL_NAME" \
+            && overwrite_not_forbidden $FORCE_OPT "$DEST/$F5_REL_NAME" \
+            && overwrite_not_forbidden $FORCE_OPT "$DEST/$F6_REL_NAME"; then
+
+        F1_FULL_NAME="$DEST/$F1_REL_NAME";
+        "$MKDIR" -p "${F1_FULL_NAME%/*}";
+        "$CP" "$F1" "$F1_FULL_NAME";
+
+        F2_FULL_NAME="$DEST/$F2_REL_NAME";
+        "$MKDIR" -p "${F2_FULL_NAME%/*}";
+        "$CP" "$F2" "$F2_FULL_NAME";
+
+        F3_FULL_NAME="$DEST/$F3_REL_NAME";
+        "$MKDIR" -p "${F3_FULL_NAME%/*}";
+        "$CP" "$F3" "$F3_FULL_NAME";
+
+        F4_FULL_NAME="$DEST/$F4_REL_NAME";
+        "$MKDIR" -p "${F4_FULL_NAME%/*}";
+        "$CP" "$F4" "$F4_FULL_NAME";
+
+        F5_FULL_NAME="$DEST/$F5_REL_NAME";
+        "$MKDIR" -p "${F5_FULL_NAME%/*}";
+        "$CP" "$F5" "$F5_FULL_NAME";
+
+        F6_FULL_NAME="$DEST/$F6_REL_NAME";
+        "$MKDIR" -p "${F6_FULL_NAME%/*}";
+        "$CP" "$F6" "$F6_FULL_NAME";
+
+        echo "You may now want to recompile XMonad. To do this, run:";
+        echo "xmonad --recompile";
+
+    else
+        echo "Aborting. Nothing done.">&2;
+        exit 1;
+    fi;
+fi;

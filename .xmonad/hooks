@@ -1,0 +1,308 @@
+#!/bin/sh
+
+# -----------------------------------------------------------------------------
+
+# Prepends the argument with "FATAL ERROR: " and echoes it to standard error,
+# then terminates the script with exit status 1. If no argument or empty
+# argument given, echoes "FATAL_ERROR" to standard error then terminates the
+# script with exit status 1.
+#
+# ARGUMENT:
+# $1: Any string.
+fatal() {
+
+    FATAL_ERROR="FATAL ERROR";
+    if [ $# -gt 0 ] && [ -n "$1" ]; then
+        echo "$FATAL_ERROR: $1">&2;
+    else
+        echo "$FATAL_ERROR">&2;
+    fi;
+    echo "Use \"$SCRIPT_PATH --help\" for documentation">&2;
+
+    exit 1;
+}
+
+# -----------------------------------------------------------------------------
+
+# Echoes the first argument being an executable command. Echoes nothing if none
+# of the arguments is an executable command.
+#
+# ARGUMENTS:
+# Any strings.
+echo_cmd() {
+    until [ $# -eq 0 ] || command -v "$1"; do
+        shift;
+    done;
+}
+
+# -----------------------------------------------------------------------------
+
+# Echoes the first argument being an executable command and returns with exit
+# status 0. If none of the arguments is an executable command, then terminates
+# the script with a call to function fatal and thus exit status 1.
+#
+# ARGUMENTS:
+# Any strings.
+echo_cmd_fatal() {
+
+    until [ $# -eq 0 ] || command -v "$1"; do
+        LAST_CMD="$1";
+        shift;
+    done;
+
+    if [ $# -eq 0 ]; then
+        if [ -n "$LAST_CMD" ]; then
+            fatal "$LAST_CMD does not seem to be installed.";
+        else
+            fatal;
+        fi;
+    fi;
+}
+
+# -----------------------------------------------------------------------------
+
+# prints the documentation for the script to the standard output.
+#
+# ARGUMENT
+# $1: Script name.
+documentation() {
+
+    FMT="fmt";
+    CMD=$(echo_cmd_fatal "$FMT" cat);
+    if [ ${CMD##*/} = "$FMT" ] && [ -n "$(echo_cmd tput)" ]; then
+        CMD="fmt --width=$(tput cols)";
+    fi;
+
+    local SCRIPT_NAME="$1";
+    $CMD <<EOF
+Usage:
+
+    $SCRIPT_NAME startup
+EOF
+    $CMD <<EOF
+    $SCRIPT_NAME -h|--help
+
+Description:
+
+    $SCRIPT_NAME with the "startup" argument launches the following programs \
+if they are installed on the system, if they are not already run by the user \
+and the if the associated environment variable is not set to false.
+EOF
+    $CMD <<EOF
+    - dclock (associated environment variable: DCLOCK_ON_STARTUP)
+EOF
+    $CMD <<EOF
+    - claws-mail (associated environment variable: CLAWS_ON_STARTUP)
+EOF
+    $CMD <<EOF
+    - iceweasel (associated environment variable: ICEWEASEL_ON_STARTUP)
+
+    The script does nothing if the environment variable STARTUP_HOOK is set \
+to false
+
+    Exits with exit status 0 even if all the applications have not been \
+launched.
+
+Options:
+
+    -h, --help
+        Display this documentation and exit.
+EOF
+}
+
+# -----------------------------------------------------------------------------
+
+# Returns 0 if the argument starts with "-". Returns 1 otherwise.
+#
+# ARGUMENT
+# $1: Any string.
+has_hyphen_leader() {
+    if [ -n "$1" ] && [ -z ${1%%-*} ]; then
+        return 0;
+    else
+        return 1;
+    fi;
+}
+
+# -----------------------------------------------------------------------------
+
+# Returns 0 if the argument starts with "--". Returns 1 otherwise.
+#
+# ARGUMENT
+# $1: Any string.
+has_double_hyphen_leader() {
+    if [ -n "$1" ] && [ -z ${1%%--*} ]; then
+        return 0;
+    else
+        return 1;
+    fi;
+}
+
+# -----------------------------------------------------------------------------
+
+# Is supposed to be called with all the arguments to the current script.
+#
+# Affects the following variables:
+#   HELP_OPT:  true if the user has requested the printing of the script
+#              documentation, false otherwise.
+#   HOOK:      Argument to the script.
+#
+# An unrecognized option will cause the script to terminate with a call to the
+# fatal function and thus exit status 1.
+#
+# ARGUMENTS
+# All the arguments to the current script.
+process_args() {
+
+    HELP_OPT=false;
+    HOOK="";
+
+    # Process the options.
+    OPT_PROCESSED=false;
+    while ! $OPT_PROCESSED && [ $# -gt 0 ] && has_hyphen_leader "$1"; do
+
+        OPT_STRING=${1#?}; # If $1 is "-abc" then $OPT_STRING is "abc".
+                           # If $1 is "--force" then $OPT_STRING is "-force".
+
+        if has_double_hyphen_leader "$1"; then
+            N=1;
+        else
+            N=${#OPT_STRING};
+        fi;
+
+        for k in $(seq 1 $N); do
+            if [ $N -gt 1 ]; then
+                OPT=${OPT_STRING%${OPT_STRING#?}}; # If $OPT_STRING is "abc" at
+                                                   # the beginning of the loop,
+                                                   # then $OPT is "a",
+                                                   # then "b", then "c".
+            else
+                OPT="$OPT_STRING";
+            fi;
+
+            case "-$OPT" in
+                --) OPT_PROCESSED=true;;
+                -h|--help) HELP_OPT=true;;
+                *) fatal "Unrecognized option: -$OPT"
+            esac;
+
+            if [ $N -gt 1 ]; then
+                OPT_STRING=${OPT_STRING#?};
+            fi;
+        done;
+
+        shift;
+    done;
+
+    # Process the other arguments.
+    if [ $# -gt 0 ]; then
+        HOOK="$1";
+    elif ! $HELP_OPT; then
+        fatal "One argument required";
+    fi;
+}
+
+# -----------------------------------------------------------------------------
+
+# Echoes the first PID owned by the user found for the command given as
+# argument. Echoes nothing if no PID is found for the command given as
+# argument.
+#
+# For example, if the argument is "bar", then the function will echo the first
+# PID owned by the user found for a "bar" program, no matter in which directory
+# this "bar" program is.
+#
+# Other example: if the argument is "/foo/bar", then the function will echo the
+# first PID owned by the user found for a "bar" program, no matter in which
+# directory this "bar" program is.
+#
+# Last example: if the argument is "../foo/bar", then the function will echo
+# the first PID owned by the user found for a "bar" program, no matter in which
+# directory this "bar" program is.
+#
+# ARGUMENT
+# $1: Command.
+cmd_pid() {
+
+    # Cause a fatal error if one of the programs needed by the function is not
+    # available on the system.
+    PS=$(echo_cmd_fatal ps);
+    GREP=$(echo_cmd_fatal grep);
+    SED=$(echo_cmd_fatal sed);
+    HEAD=$(echo_cmd_fatal head);
+
+    CMD=${1##*/};
+    REG_EXP="^\s*\([0-9]\+\)\s\+\S\+\s\+\S\+\s\+\S\+\s\+\(\S\+\).*$";
+    $PS x|$GREP $REG_EXP|$SED "s/$REG_EXP/\1 \2/"|$SED "s/ .*\// /"\
+        |$GREP " $CMD$"|$HEAD -1|$SED "s/ .\+$//";
+}
+
+# -----------------------------------------------------------------------------
+
+# Lauches the command given as first argument with all the other arguments as
+# arguments if the command is installed on the system and a command with the
+# same name is not already run by the user.
+#
+# ARGUMENT
+# $1: Command.
+launch_app() {
+    CMD=$(echo_cmd "$1");
+    shift;
+    if [ -n "$CMD" ]; then
+        if [ -z $(cmd_pid "$CMD") ]; then
+            set +o errexit
+            "$CMD" $@ &
+            set -o errexit
+        fi;
+    fi;
+}
+
+# -----------------------------------------------------------------------------
+
+# Is launched when the argument to the script is "startup". If the variable
+# STARTUP_HOOK has been set to false, then the function has no action.
+# Otherwise, the action of the function is:
+# 1) Call function launch_dclock unless the variable DCLOCK_ON_STARTUP has been
+#    set to false.
+# 2) Call function launch_claws unless the variable CLAWS_ON_STARTUP has been
+#    set to false.
+# 3) Call function launch_iceweasel unless the variable ICEWEASEL_ON_STARTUP
+#    has been set to false.
+startup() {
+    if [ -z ${STARTUP_HOOK+x} ] || $STARTUP_HOOK; then
+        if [ -z ${DCLOCK_ON_STARTUP+x} ] || $DCLOCK_ON_STARTUP; then
+            launch_app dclock -date "%F(%a)" -bw 0;
+        fi;
+        if [ -z ${CLAWS_ON_STARTUP+x} ] || $CLAWS_ON_STARTUP; then
+            launch_app claws-mail;
+        fi;
+        if [ -z ${ICEWEASEL_ON_STARTUP+x} ] || $ICEWEASEL_ON_STARTUP; then
+            launch_app iceweasel;
+        fi;
+    fi;
+}
+
+# -----------------------------------------------------------------------------
+
+# The script will terminate if trying to use an uninitialized variable.
+set -o nounset
+
+# The script will terminate if any statement returns a non-true return value.
+set -o errexit
+
+# Get the path to the script.
+SCRIPT_PATH="$0";
+
+# Get the base name of the script.
+SCRIPT_BASE_NAME=$(basename "$SCRIPT_PATH");
+
+process_args "$@";
+
+if $HELP_OPT; then
+    documentation $SCRIPT_BASE_NAME;
+else
+    case $HOOK in
+        startup) startup;;
+        *) fatal "Unrecognized hook: $HOOK";;
+    esac;
+fi

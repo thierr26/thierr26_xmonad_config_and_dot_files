@@ -367,7 +367,7 @@ else
         "$MKDIR" -p "${F6_FULL_NAME%/*}";
         "$CP" "$F6" "$F6_FULL_NAME";
 
-        echo "You may now want to recompile XMonad. To do this, run:";
+        echo "You may now want to recompile xmonad. To do this, run:";
         echo "xmonad --recompile";
 
     else

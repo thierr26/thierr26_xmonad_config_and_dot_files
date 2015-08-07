@@ -239,7 +239,7 @@ cmd_pid() {
 
 # -----------------------------------------------------------------------------
 
-# Lauches the command given as first argument with all the other arguments as
+# Launches the command given as first argument with all the other arguments as
 # arguments if the command is installed on the system and a command with the
 # same name is not already run by the user.
 #

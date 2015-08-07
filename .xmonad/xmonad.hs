@@ -125,7 +125,7 @@ myShowWName = showWName' defaultSWNConfig {
 -- In all the edit workspaces, the master pane will be 163 columns wide (163
 -- is the number of columns used by Vim when the Vim window is vertically split
 -- in two editing windows, separated by the split separator (one column wide),
--- and with foldcolums set to 1). In the other workspaces, the master pane
+-- and with foldcolumn set to 1). In the other workspaces, the master pane
 -- will be 80 columns wide. In every workspace, it will be possible to switch
 -- to the Full layout (without window border).
 myLayout = myShowWName (ModifiedLayout clockMonitor

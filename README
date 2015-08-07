@@ -24,16 +24,17 @@ web pages have been particularly helpful:
 
         - http://joeyh.name/blog/entry/xmonad_layouts_for_netbooks/
 
-So the files in this repository are:
-
 ==============================================================================
+Precisely, the files in this repository are:
+
+----------------------------------------------
 .xinitrc
 
         Thanks to this file and the "xsetroot -cursor_name left_ptr" command
         that it contains, the mouse cursor is the classical arrow instead of
         the default "X" cursor in some application (in particular Claws Mail).
 
-==============================================================================
+----------------------------------------------
 .Xresources
 
         This file sets some default parameters for xterm, xmessage and dclock.
@@ -52,8 +53,8 @@ So the files in this repository are:
 
         apt-get install fonts-inconsolata
 
-==============================================================================
-.moc/config, the author's MOC (music on console) configuration.
+----------------------------------------------
+.moc/config, the MOC (music on console) configuration.
 
         The line:
 
@@ -66,8 +67,8 @@ So the files in this repository are:
 
         apt-get install moc
 
-==============================================================================
-.xbindkeysrc, the author's user configuration file for xbindkeys.
+----------------------------------------------
+.xbindkeysrc, the user configuration file for xbindkeys.
 
         It binds the multimedia keys of the keyboard to command lines. It has
         been tested with a Cherry Stream XT corded keyboard only. Hopefully it
@@ -95,8 +96,8 @@ So the files in this repository are:
 
         apt-get install xbindkeys
 
-==============================================================================
-.xmonad/xmonad.hs, the author's xmonad configuration.
+----------------------------------------------
+.xmonad/xmonad.hs, the xmonad configuration.
 
         This file is heavily commented. Here is a description of the
         configuration:
@@ -124,7 +125,7 @@ So the files in this repository are:
 
                   ALL     ALL=NOPASSWD: /sbin/poweroff, /sbin/reboot
 
-                  Not also that the Lock command lauches xtrlock and thus
+                  Not also that the Lock command launches xtrlock and thus
                   won't work if xtrlock is not installed on the system. On a
                   Debian GNU/Linux system, you can install it with the command
                   (as root):
@@ -209,12 +210,12 @@ So the files in this repository are:
 
                   https://github.com/thierr26/wibafoco
 
-==============================================================================
-.xmonad/hooks, the shell script which is run on xmonad startup and restart in
-the author's configuration.
+----------------------------------------------
+.xmonad/hooks, the shell script which is run on xmonad startup and restart
+thanks to the 'execScriptHook "startup"' function call in .xmonad/xmonad.hs.
 
         When run with the "startup" argument, this script launches the
-        following applicationq if they are installed on the system and if they
+        following applications if they are installed on the system and if they
         are not already run by the user:
         * dclock,
         * Claws Mail,
@@ -224,16 +225,23 @@ the author's configuration.
         environment variables definitions. Please run the script with the
         --help option for more information.
 
-==============================================================================
+----------------------------------------------
 install_thierr26_xmonad_config_and_dot_files, a shell script to install the
 files.
 
         This script copies all the above files to the user's home directory or
         to the directory specified on the command line. Launch the script with
-        the --help option for a complete documentation.
+        the --help option for a more detailed documentation.
 
-==============================================================================
+        Note that no backup of the overwritten files is done.
+
+----------------------------------------------
 README, the present file.
 
-==============================================================================
+----------------------------------------------
 LICENSE, the license file (Unlicense license).
+
+==============================================================================
+Author: Thierry Rascle (thierr26@free.fr)
+
+Licensed under the Unlicense license (see http://unlicense.org).

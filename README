@@ -226,8 +226,8 @@ thanks to the 'execScriptHook "startup"' function call in .xmonad/xmonad.hs.
         --help option for more information.
 
 ----------------------------------------------
-install_thierr26_xmonad_config_and_dot_files, a shell script to install the
-files.
+install_thierr26_xmonad_config_and_dot_files, a shell script (actually a dash
+script) to install the files.
 
         This script copies all the above files to the user's home directory or
         to the directory specified on the command line. Launch the script with

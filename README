@@ -38,7 +38,7 @@ Precisely, the files in this repository are:
 .Xresources
 
         This file sets some default parameters for xterm, xmessage and dclock.
-        In particular, the line:
+        Most notably, the line:
 
         xmessage*international: true
 

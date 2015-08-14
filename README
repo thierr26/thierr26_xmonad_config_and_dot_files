@@ -32,7 +32,7 @@ Precisely, the files in this repository are:
 
         Thanks to this file and the "xsetroot -cursor_name left_ptr" command
         that it contains, the mouse cursor is the classical arrow instead of
-        the default "X" cursor in some application (in particular Claws Mail).
+        the default "X" cursor in some application (Claws Mail in particular).
 
 ----------------------------------------------
 .Xresources
@@ -79,8 +79,8 @@ Precisely, the files in this repository are:
         alsa-utils package.
 
         The "next track", "previous track" and "pause" keys are bound to MOC
-        (music on console) commands. In particular, the "next track" key is
-        bound to this command:
+        (music on console) commands. The "next track" key in particular is
+        bound to a not so trivial command:
 
         mocp -S 2>/dev/null; if [ $? -eq 0 ]; then mocp -p; else mocp -f; fi;
 
@@ -105,12 +105,14 @@ Precisely, the files in this repository are:
                 - The Mod key is bound to the Windows key (Mod4).
 
                 - The key binding is adapted for AZERTY keyboards users.
+                  Mod + semicolon is used to decrease the number of windows in
+                  in the master pane (instead of Mod + period).
 
                 - dmenu shows up at the bottom of screen instead of at the
                   top, and with specific colors.
 
-                - Mod key + left arrow and Mod key + right arrow allow cycling
-                  through the non-empty workspaces.
+                - Mod + left arrow and Mod + right arrow allow cycling through
+                  the non-empty workspaces.
 
                 - Mod + x triggers a command prompt.
 
@@ -194,15 +196,15 @@ Precisely, the files in this repository are:
                   switch between them with Mod + space.
 
                   In all but the four "edit" workspaces, the width of the
-                  master pane is fixed to 80 characters, which is good for
-                  working in a terminal or editing a file in (say) Vim with a
-                  80 characters text width.
+                  master pane in the "fixed column" layout is fixed to 80
+                  characters, which is good for working in a terminal or
+                  editing a file in (say) Vim with a 80 characters text width.
 
                   In the four "edit" workspaces, the width of the master pane
-                  is fixed to 163 characters which is good for editing two
-                  files side by side in Vim (vertical split) with the
-                  foldcolumn option set to 1 and a 80 characters text width in
-                  both files.
+                  in the "fixed column" layout is fixed to 163 characters
+                  which is good for editing two files side by side in Vim
+                  (vertical split) with the foldcolumn option set to 1 and a
+                  80 characters text width in both files.
 
                   You might want to try the Wibafoco Vim plugin which
                   automatically changes the foldcolumn option depending on the

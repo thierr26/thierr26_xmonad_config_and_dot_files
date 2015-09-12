@@ -61,7 +61,7 @@ echo_cmd_fatal() {
 
 # -----------------------------------------------------------------------------
 
-# prints the documentation for the script to the standard output.
+# Prints the documentation for the script to the standard output.
 #
 # ARGUMENT
 # $1: Script name.

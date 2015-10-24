@@ -26,12 +26,15 @@ myModMask = mod4Mask
 -- The default key binding will be modified for AZERTY keyboards.
 myKeys = azertyKeys <+> keys defaultConfig
 
--- The following font will be used for dmenu and the workspace names.
-popupFont = "-*-lucidatypewriter-*-*-*-*-26-*-*-*-*-*-*-*"
+-- The following font will be used for dmenu.
+dmenuFont = "Inconsolata-26"
+
+-- The following font will be used for displaying the workspace names.
+showWNameFont = "-*-lucidatypewriter-*-*-*-*-26-*-*-*-*-*-*-*"
 
 -- Specific options will be applied to dmenu (the -b option causes dmenu to
 -- show up at the bottom of the screen instead of at the top).
-dmenuOptions = "-b -fn " ++ popupFont ++ " -nb '" ++ backColor ++ "' -nf '"
+dmenuOptions = "-b -fn " ++ dmenuFont ++ " -nb '" ++ backColor ++ "' -nf '"
     ++ selColor ++ "' -sb '" ++ backColor ++ "' -sf '" ++ popupColor ++ "'"
 dmenuCommand = "exe=`dmenu_run " ++ dmenuOptions ++ "` && eval \"exec $exe\""
 
@@ -118,7 +121,7 @@ myManageHook = composeAll [
 -- switching between workspaces.
 myShowWName = showWName' defaultSWNConfig {
     swn_color = popupColor,
-    swn_font = popupFont,
+    swn_font = showWNameFont,
     swn_fade = 0.5
 }
 

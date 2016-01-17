@@ -55,7 +55,8 @@ systemPromptCmds = [
         ("Lock", spawn "xtrlock -b"),
         ("Restart", restart "xmonad" True)
     ]
-mocMessageCmd = "xmessage $(mocp -i|grep ^Title|"
+mocMessageCmd = "xmessage -geometry 1300x68+300+600 "
+    ++ "$(mocp -i|grep ^Title|"
     ++ "sed 's/^Title:\\s*[0-9]\\+\\s*//')"
 newKeys = [
         ((myModMask, xK_Right), moveTo Next NonEmptyWS),

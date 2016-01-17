@@ -23,9 +23,6 @@ xmessage.form.okay.foreground: lightgray
 xmessage*background: #202020
 xmessage*foreground: lightgray
 
-! Define xmessage position.
-xmessage*geometry: +700+600
-
 ! -----------------------------------------------------------------------------
 
 ! Don't sound the bell in dclock.

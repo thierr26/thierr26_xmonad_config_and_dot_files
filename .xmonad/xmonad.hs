@@ -114,7 +114,7 @@ myManageHook = composeAll [
         className =? "Gimp" --> doShift (myWorkSpaces !! 4),
         className =? "Gimp" --> doFloat,
         className =? "Xzgv" --> doShift (myWorkSpaces !! 3),
-        className =? "Iceweasel" --> doShift (myWorkSpaces !! 1),
+        className =? "Firefox" --> doShift (myWorkSpaces !! 1),
         className =? "Xmessage" --> doFloat
    ] <+> manageMonitor clockMonitor
 
@@ -149,7 +149,7 @@ myLayout = myShowWName (ModifiedLayout clockMonitor
 -- The script .xmonad/hooks will be executed on startup. It launches:
 -- - dclock,
 -- - claws-mail,
--- - iceweasel.
+-- - firefox.
 -- If these applications are not installed or already run by the run, they are
 -- not launched by the script.
 -- If you don't want one or all of these applications to be launched, please

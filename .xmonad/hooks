@@ -45,6 +45,7 @@ echo_cmd() {
 # Any strings.
 echo_cmd_fatal() {
 
+    local LAST_CMD;
     until [ $# -eq 0 ] || command -v "$1"; do
         LAST_CMD="$1";
         shift;
@@ -67,19 +68,19 @@ echo_cmd_fatal() {
 # $1: Script name.
 documentation() {
 
-    FMT="fmt";
+    local SCRIPT_NAME="$1";
+    local FMT="fmt";
+    local CMD=$(echo_cmd_fatal "$FMT" cat);
     CMD=$(echo_cmd_fatal "$FMT" cat);
     if [ ${CMD##*/} = "$FMT" ] && [ -n "$(echo_cmd tput)" ]; then
         CMD="fmt --width=$(tput cols)";
     fi;
 
-    local SCRIPT_NAME="$1";
     $CMD <<EOF
 Usage:
 
     $SCRIPT_NAME startup
-EOF
-    $CMD <<EOF
+
     $SCRIPT_NAME -h|--help
 
 Description:
@@ -87,15 +88,12 @@ Description:
     $SCRIPT_NAME with the "startup" argument launches the following programs \
 if they are installed on the system, if they are not already run by the user \
 and the if the associated environment variable is not set to false.
-EOF
-    $CMD <<EOF
+
     - dclock (associated environment variable: DCLOCK_ON_STARTUP)
-EOF
-    $CMD <<EOF
+
     - claws-mail (associated environment variable: CLAWS_ON_STARTUP)
-EOF
-    $CMD <<EOF
-    - iceweasel (associated environment variable: ICEWEASEL_ON_STARTUP)
+
+    - firefox (associated environment variable: FIREFOX_ON_STARTUP)
 
     The script does nothing if the environment variable STARTUP_HOOK is set \
 to false
@@ -158,6 +156,10 @@ process_args() {
     HOOK="";
 
     # Process the options.
+    local OPT_STRING;
+    local N;
+    local K;
+    local OPT;
     OPT_PROCESSED=false;
     while ! $OPT_PROCESSED && [ $# -gt 0 ] && has_hyphen_leader "$1"; do
 
@@ -170,7 +172,7 @@ process_args() {
             N=${#OPT_STRING};
         fi;
 
-        for k in $(seq 1 $N); do
+        for K in $(seq 1 $N); do
             if [ $N -gt 1 ]; then
                 OPT=${OPT_STRING%${OPT_STRING#?}}; # If $OPT_STRING is "abc" at
                                                    # the beginning of the loop,
@@ -226,13 +228,13 @@ cmd_pid() {
 
     # Cause a fatal error if one of the programs needed by the function is not
     # available on the system.
-    PS=$(echo_cmd_fatal ps);
-    GREP=$(echo_cmd_fatal grep);
-    SED=$(echo_cmd_fatal sed);
-    HEAD=$(echo_cmd_fatal head);
+    local PS=$(echo_cmd_fatal ps);
+    local GREP=$(echo_cmd_fatal grep);
+    local SED=$(echo_cmd_fatal sed);
+    local HEAD=$(echo_cmd_fatal head);
 
-    CMD=${1##*/};
-    REG_EXP="^\s*\([0-9]\+\)\s\+\S\+\s\+\S\+\s\+\S\+\s\+\(\S\+\).*$";
+    local CMD=${1##*/};
+    local REG_EXP="^\s*\([0-9]\+\)\s\+\S\+\s\+\S\+\s\+\S\+\s\+\(\S\+\).*$";
     $PS x|$GREP $REG_EXP|$SED "s/$REG_EXP/\1 \2/"|$SED "s/ .*\// /"\
         |$GREP " $CMD$"|$HEAD -1|$SED "s/ .\+$//";
 }
@@ -246,7 +248,7 @@ cmd_pid() {
 # ARGUMENT
 # $1: Command.
 launch_app() {
-    CMD=$(echo_cmd "$1");
+    local CMD=$(echo_cmd "$1");
     shift;
     if [ -n "$CMD" ]; then
         if [ -z $(cmd_pid "$CMD") ]; then
@@ -266,8 +268,8 @@ launch_app() {
 #    set to false.
 # 2) Call function launch_claws unless the variable CLAWS_ON_STARTUP has been
 #    set to false.
-# 3) Call function launch_iceweasel unless the variable ICEWEASEL_ON_STARTUP
-#    has been set to false.
+# 3) Call function launch_firefox unless the variable FIREFOX_ON_STARTUP has
+#    been set to false.
 startup() {
     if [ -z ${STARTUP_HOOK+x} ] || $STARTUP_HOOK; then
         if [ -z ${DCLOCK_ON_STARTUP+x} ] || $DCLOCK_ON_STARTUP; then
@@ -276,8 +278,8 @@ startup() {
         if [ -z ${CLAWS_ON_STARTUP+x} ] || $CLAWS_ON_STARTUP; then
             launch_app claws-mail;
         fi;
-        if [ -z ${ICEWEASEL_ON_STARTUP+x} ] || $ICEWEASEL_ON_STARTUP; then
-            launch_app iceweasel;
+        if [ -z ${FIREFOX_ON_STARTUP+x} ] || $FIREFOX_ON_STARTUP; then
+            launch_app firefox;
         fi;
     fi;
 }

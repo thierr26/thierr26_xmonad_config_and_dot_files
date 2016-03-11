@@ -154,7 +154,7 @@ Precisely, the files in this repository are:
                 - Some applications are automatically moved to particular
                   workspaces:
                   * Claws Mail to 1:mail,
-                  * Iceweasel to 2:web,
+                  * Firefox to 2:web,
                   * Gajim to 3:chat,
                   * xzgv to 4:image1,
                   * GIMP to 5:image2.
@@ -169,9 +169,9 @@ Precisely, the files in this repository are:
                   the user:
                   * dclock,
                   * Claws Mail,
-                  * Iceweasel.
+                  * Firefox.
 
-                  As already mentioned, Claws Mail and Iceweasel are
+                  As already mentioned, Claws Mail and Firefox are
                   automatically moved to particular workspaces.
 
                   dclock is permanently displayed in the upper right corner of
@@ -221,7 +221,7 @@ thanks to the 'execScriptHook "startup"' function call in .xmonad/xmonad.hs.
         are not already run by the user:
         * dclock,
         * Claws Mail,
-        * Iceweasel.
+        * Firefox.
 
         It is possible to partially or totally disable the script through
         environment variables definitions. Please run the script with the

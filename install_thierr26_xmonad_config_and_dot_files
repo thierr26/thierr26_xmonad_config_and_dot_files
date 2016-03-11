@@ -45,6 +45,7 @@ echo_cmd() {
 # Any strings.
 echo_cmd_fatal() {
 
+    local LAST_CMD;
     until [ $# -eq 0 ] || command -v "$1"; do
         LAST_CMD="$1";
         shift;
@@ -67,19 +68,18 @@ echo_cmd_fatal() {
 # $1: Script name.
 documentation() {
 
-    FMT="fmt";
-    CMD=$(echo_cmd_fatal "$FMT" cat);
+    local SCRIPT_NAME="$1";
+    local FMT="fmt";
+    local CMD=$(echo_cmd_fatal "$FMT" cat);
     if [ ${CMD##*/} = "$FMT" ] && [ -n "$(echo_cmd tput)" ]; then
         CMD="fmt --width=$(tput cols)";
     fi;
 
-    local SCRIPT_NAME="$1";
     $CMD <<EOF
 Usage:
 
     $SCRIPT_NAME [-f|--force] [DEST]
-EOF
-    $CMD <<EOF
+
     $SCRIPT_NAME -h|--help
 
 Description:
@@ -152,7 +152,11 @@ process_args() {
     DEST=$HOME;
 
     # Process the options.
-    OPT_PROCESSED=false;
+    local OPT_STRING;
+    local N;
+    local K;
+    local OPT;
+    local OPT_PROCESSED=false;
     while ! $OPT_PROCESSED && [ $# -gt 0 ] && has_hyphen_leader "$1"; do
 
         OPT_STRING=${1#?}; # If $1 is "-abc" then $OPT_STRING is "abc".
@@ -268,6 +272,7 @@ is_not_read_only() {
 # $1: true to cause the function to return 0 without any confirmation.
 # $2: A file name.
 overwrite_not_forbidden() {
+    local ANSWER;
     if ! $1 && [ -e "$2" ]; then
         while true; do
             echo -n "Overwrite $2 (y/n)? ";

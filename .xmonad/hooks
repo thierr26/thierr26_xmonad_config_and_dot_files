@@ -160,7 +160,7 @@ process_args() {
     local N;
     local K;
     local OPT;
-    OPT_PROCESSED=false;
+    local OPT_PROCESSED=false;
     while ! $OPT_PROCESSED && [ $# -gt 0 ] && has_hyphen_leader "$1"; do
 
         OPT_STRING=${1#?}; # If $1 is "-abc" then $OPT_STRING is "abc".

@@ -114,7 +114,7 @@ myManageHook = composeAll [
         className =? "Gimp" --> doShift (myWorkSpaces !! 4),
         className =? "Gimp" --> doFloat,
         className =? "Xzgv" --> doShift (myWorkSpaces !! 3),
-        className =? "Firefox" --> doShift (myWorkSpaces !! 1),
+        className =? "Firefox-esr" --> doShift (myWorkSpaces !! 1),
         className =? "Xmessage" --> doFloat
    ] <+> manageMonitor clockMonitor
 

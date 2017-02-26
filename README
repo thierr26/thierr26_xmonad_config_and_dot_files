@@ -139,10 +139,10 @@ Precisely, the files in this repository are:
 
                 - The workspaces are given names:
                   * 1:mail
-                  * 2:web
-                  * 3:chat
-                  * 4:image1
-                  * 5:image2
+                  * 2:chat
+                  * 3:image1
+                  * 4:image2
+                  * 5:browsing
                   * 6:edit1
                   * 7:edit2
                   * 8:edit3
@@ -154,10 +154,10 @@ Precisely, the files in this repository are:
                 - Some applications are automatically moved to particular
                   workspaces:
                   * Claws Mail to 1:mail,
-                  * Firefox to 2:web,
-                  * Gajim to 3:chat,
-                  * xzgv to 4:image1,
-                  * GIMP to 5:image2.
+                  * Gajim to 2:chat,
+                  * xzgv to 3:image1,
+                  * GIMP to 4:image2,
+                  * Firefox to 5:browsing.
 
                 - GIMP and xmessage are automatically moved to the floating
                   layer.
@@ -193,18 +193,21 @@ Precisely, the files in this repository are:
 
                 - There are two layouts available in each workspace : the
                   "fixed column" layout and the "full screen" layout. You can
-                  switch between them with Mod + space.
+                  switch between them with Mod + space. Actually, there is one
+                  exception: In the browsing workspace, the "fixed column" is
+                  not available. Instead, the tall layout is available, with
+                  the master pane being 4/9 of the screen width.
 
-                  In all but the four "edit" workspaces, the width of the
-                  master pane in the "fixed column" layout is fixed to 80
-                  characters, which is good for working in a terminal or
-                  editing a file in (say) Vim with a 80 characters text width.
+                  In workspaces 1 to 4, the width of the master pane in the
+                  "fixed column" layout is fixed to 80 characters, which is
+                  good for working in a terminal or editing a file in (say)
+                  Vim with a 80 characters text width.
 
-                  In the four "edit" workspaces, the width of the master pane
-                  in the "fixed column" layout is fixed to 163 characters
-                  which is good for editing two files side by side in Vim
-                  (vertical split) with the foldcolumn option set to 1 and a
-                  80 characters text width in both files.
+                  In the four "edit" workspaces (workspaces 6 to 9), the width
+                  of the master pane in the "fixed column" layout is fixed to
+                  163 characters which is good for editing two files side by
+                  side in Vim (vertical split) with the foldcolumn option set
+                  to 1 and a 80 characters text width in both files.
 
                   You might want to try the Wibafoco Vim plugin which
                   automatically changes the foldcolumn option depending on the

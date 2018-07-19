@@ -114,7 +114,7 @@ myManageHook = composeAll [
         className =? "Gimp" --> doShift (myWorkSpaces !! 3),
         className =? "Gimp" --> doFloat,
         className =? "Xzgv" --> doShift (myWorkSpaces !! 2),
-        className =? "Firefox-esr" --> doShift (myWorkSpaces !! 4),
+        className =? "Firefox" --> doShift (myWorkSpaces !! 4),
         className =? "Xmessage" --> doFloat
    ] <+> manageMonitor clockMonitor
 
@@ -154,7 +154,7 @@ myLayout = myShowWName (ModifiedLayout clockMonitor
 -- - dclock,
 -- - claws-mail,
 -- - firefox.
--- If these applications are not installed or already run by the run, they are
+-- If these applications are not installed or already run by the user, they are
 -- not launched by the script.
 -- If you don't want one or all of these applications to be launched, please
 -- run the script .xmonad/hooks with the --help option to see how to prevent

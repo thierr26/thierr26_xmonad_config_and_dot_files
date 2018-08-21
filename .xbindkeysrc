@@ -1,10 +1,10 @@
-"amixer set 'Headphone' 5%+; amixer set 'Front' 5%+"
+"amixer -c 0 set 'Master' 5%+"
     m:0x10 + c:123
 
-"amixer set 'Headphone' 5%-; amixer set 'Front' 5%-"
+"amixer -c 0 set 'Master' 5%-"
     m:0x10 + c:122
 
-"amixer set 'Headphone' toggle; amixer set 'Front' toggle"
+"amixer -c 0 set 'Master' toggle"
     m:0x10 + c:121
 
 "mocp -r"

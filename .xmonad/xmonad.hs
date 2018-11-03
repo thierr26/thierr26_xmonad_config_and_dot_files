@@ -126,29 +126,29 @@ myShowWName = showWName' defaultSWNConfig {
     swn_fade = 0.5
 }
 
--- In all the edit workspaces, the master pane will be 163 columns wide (163 is
+-- In all the edit workspaces, the master pane will be 161 columns wide (161 is
 -- the number of columns used by Vim when the Vim window is vertically split in
--- two editing windows, separated by the split separator (one column wide), and
--- with foldcolumn set to 1). In the browsing workspace, the master pane will
--- be 4/9 of the screen width. In the other workspaces, the master pane will be
--- 80 columns wide. In every workspace, it will be possible to switch to the
--- Full layout (without window border).
+-- two 80 characters wide editing windows, separated by the split separator
+-- (one column wide), and with foldcolumn set to 0). In the browsing workspace,
+-- the master pane will be 4/9 of the screen width. In the other workspaces,
+-- the master pane will be 80 columns wide. In every workspace, it will be
+-- possible to switch to the Full layout (without window border).
 myLayout = myShowWName (ModifiedLayout clockMonitor
         $ toggleLayouts (noBorders Full) perWorkspace)
     where
         perWorkspace =
             onWorkspace (myWorkSpaces !! 4) master4over9
-            $ onWorkspace (myWorkSpaces !! 5) master163ColLayout
-            $ onWorkspace (myWorkSpaces !! 6) master163ColLayout
-            $ onWorkspace (myWorkSpaces !! 7) master163ColLayout
-            $ onWorkspace (myWorkSpaces !! 8) master163ColLayout
+            $ onWorkspace (myWorkSpaces !! 5) master161ColLayout
+            $ onWorkspace (myWorkSpaces !! 6) master161ColLayout
+            $ onWorkspace (myWorkSpaces !! 7) master161ColLayout
+            $ onWorkspace (myWorkSpaces !! 8) master161ColLayout
             $ master80ColLayout
 
         master80ColLayout = FixedColumn 1 0 80 8
 
         master4over9 = Tall 1 0 (4 / 9)
 
-        master163ColLayout = FixedColumn 1 0 163 16
+        master161ColLayout = FixedColumn 1 0 161 16
 
 -- The script .xmonad/hooks will be executed on startup. It launches:
 -- - dclock,
